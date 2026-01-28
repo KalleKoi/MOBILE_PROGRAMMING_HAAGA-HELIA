@@ -20,7 +20,7 @@ export default function App() {
 
       <TextInput
         style={styles.input}
-        keyboardType="default"
+        keyboardType="numeric"
         placeholder="Enter first number"
         value={num1}
         onChangeText={setNum1}

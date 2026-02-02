@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, FlatList, Keyboard } from 'react-native';
 
 export default function App() {
   const [num1, setNum1] = useState('');
   const [num2, setNum2] = useState('');
   const [result, setResult] = useState(0);
+  const [history, setHistory] = useState([]);
 
   const calculateSum = () => {
-    setResult(Number(num1) + Number(num2));
+    const res = Number(num1) + Number(num2);
+    setResult(res);
+    setHistory(prev => [
+      num1 + "+" + num2 + "=" + res,
+      ...prev
+
+    ]);
   };
 
   const calculateSubtraction = () => {
@@ -15,6 +22,7 @@ export default function App() {
   };
 
   return (
+
     <View style={styles.container}>
       <Text style={styles.title}>Simple Calculator</Text>
 
@@ -37,10 +45,23 @@ export default function App() {
       <View style={styles.buttonContainer}>
         <Button title="Sum" onPress={calculateSum} />
         <Button title="Subtract" onPress={calculateSubtraction} />
+        <Button title="Dismiss Keyboard" onPress={() => Keyboard.dismiss()} />
       </View>
 
       <Text style={styles.result}>Result: {result}</Text>
+      <View>
+        <Text style={styles.title}>History</Text>
+
+        <FlatList
+          data={history}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => <Text>{item}</Text>}
+        />
+      </View>
+
     </View>
+
+
   );
 }
 
@@ -53,7 +74,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     textAlign: 'center',
-    marginBottom: 20
+    marginBottom: 20,
+    marginTop: 40,
+    borderWidth: 2,
+    borderColor: 'black',
+    padding: 10,
+    borderRadius: 15
+
   },
   input: {
     borderWidth: 2,

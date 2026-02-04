@@ -5,39 +5,16 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator();
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center'
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: 'black',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 8
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20
-  },
-  result: {
-    fontSize: 20,
-    textAlign: 'center',
-    marginBottom: 10
-  },
-  title: {
-    fontSize: 24,
-    textAlign: 'center',
-    marginBottom: 20
-  },
-  todo: {
-    fontSize: 18,
-    paddingVertical: 5
-  },
-});
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Calculator" component={CalculatorScreen} />
+        <Stack.Screen name="History" component={HistoryScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
 
 function CalculatorScreen({ navigation }) {
@@ -105,13 +82,36 @@ function HistoryScreen({ route }) {
   );
 }
 
-export default function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Calculator" component={CalculatorScreen} />
-        <Stack.Screen name="History" component={HistoryScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center'
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: 'black',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 8
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20
+  },
+  result: {
+    fontSize: 20,
+    textAlign: 'center',
+    marginBottom: 10
+  },
+  title: {
+    fontSize: 24,
+    textAlign: 'center',
+    marginBottom: 20
+  },
+  todo: {
+    fontSize: 18,
+    paddingVertical: 5
+  },
+});

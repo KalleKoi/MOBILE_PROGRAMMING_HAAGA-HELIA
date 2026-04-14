@@ -15,23 +15,16 @@ export default function HomeScreen() {
 
 
     useEffect(() => {
-        const unsubscribe = onValue(expensesRef, (snapshot) => {
-            const data = snapshot.val();
+        return onValue(expensesRef, snapshot => {
+            const data = snapshot.val() || {};
 
-            if (!data) {
-                setExpenses([]);
-                return;
-            }
-
-            const list = Object.keys(data).map(key => ({
-                id: key,
-                ...data[key]
+            const list = Object.entries(data).map(([id, value]) => ({
+                id,
+                ...value
             }));
 
             setExpenses(list);
         });
-
-        return () => unsubscribe();
     }, []);
 
 
@@ -50,14 +43,15 @@ export default function HomeScreen() {
         setCategory('');
     }
 
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
+    const startOfToday = new Date().setHours(0, 0, 0, 0);
 
-    const totalToday = expenses
-        .filter(item => item.createdAt >= startOfToday.getTime())
-        .reduce((sum, item) => {
-            return sum + Number(item.amount || 0);
-        }, 0);
+    let totalToday = 0;
+
+    for (const e of expenses) {
+        if (e.createdAt >= startOfToday) {
+            totalToday += +e.amount || 0;
+        }
+    }
 
     return (
         <View style={{ padding: 20, flex: 1 }}>
@@ -79,14 +73,14 @@ export default function HomeScreen() {
             />
 
             <TextInput
-                placeholder="Description (e.g. Coffee)"
+                placeholder="Description"
                 value={description}
                 onChangeText={setDescription}
                 style={{ borderWidth: 1, padding: 8, marginBottom: 10 }}
             />
 
             <TextInput
-                placeholder="Category (food, rent, fun)"
+                placeholder="Category"
                 value={category}
                 onChangeText={setCategory}
                 style={{ borderWidth: 1, padding: 8, marginBottom: 10 }}

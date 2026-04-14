@@ -21,12 +21,7 @@ export default function HomeScreen() {
             const data = snapshot.val();
 
             if (data) {
-                setExpenses(
-                    Object.entries(data).map(([id, value]) => ({
-                        id,
-                        ...value
-                    }))
-                );
+                setExpenses(Object.values(data));
             } else {
                 setExpenses([]);
             }

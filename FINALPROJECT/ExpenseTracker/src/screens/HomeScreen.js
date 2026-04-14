@@ -15,15 +15,20 @@ export default function HomeScreen() {
 
 
     useEffect(() => {
-        const itemsRef = ref(database, 'items/');
+        const itemsRef = ref(db, 'expenses');
 
         const unsubscribe = onValue(itemsRef, (snapshot) => {
             const data = snapshot.val();
 
             if (data) {
-                setItems(Object.values(data));
+                setExpenses(
+                    Object.entries(data).map(([id, value]) => ({
+                        id,
+                        ...value
+                    }))
+                );
             } else {
-                setItems([]);
+                setExpenses([]);
             }
         });
 

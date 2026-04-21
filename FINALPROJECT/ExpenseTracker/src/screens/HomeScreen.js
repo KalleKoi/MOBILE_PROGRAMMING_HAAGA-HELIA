@@ -46,15 +46,26 @@ export default function HomeScreen() {
         setCategory('');
     }
 
+
+    // Calculation for total expenses of the current day and month
     const startOfToday = new Date().setHours(0, 0, 0, 0);
 
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
     let totalToday = 0;
+    let totalThisMonth = 0;
 
     for (const e of expenses) {
+        if (e.createdAt >= startOfMonth) {
+            totalThisMonth += +e.amount || 0;
+        }
         if (e.createdAt >= startOfToday) {
             totalToday += +e.amount || 0;
         }
     }
+
+
+
 
     return (
         <View style={{ padding: 20, flex: 1 }}>
@@ -65,6 +76,7 @@ export default function HomeScreen() {
 
             <Text style={{ marginVertical: 10, fontSize: 16, fontWeight: '600' }}>
                 💰 Today: {totalToday.toFixed(2)} €
+                💰 This month: {totalThisMonth.toFixed(2)} €
             </Text>
 
             <TextInput

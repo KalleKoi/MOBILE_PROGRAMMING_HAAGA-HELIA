@@ -16,20 +16,20 @@ export default function HomeScreen() {
 
     useEffect(() => {
 
-        // GET USER ID AND PATH TO EXPENSES IN DATABASE
         const uid = auth.currentUser.uid;
         const itemsRef = ref(db, `users/${uid}/expenses`);
 
-        // LISTENS TO CHANGES IN DATABASE,
-        const unsubscribe = onValue(itemsRef, (snapshot) => {
+        // START LISTENING TO DATABASE CHANGES
+        return onValue(itemsRef, (snapshot) => {
+
+            // GET DATA FROM FIREBASE
             const data = snapshot.val();
 
             if (data) {
 
-                // ARRAY TO HOLD FORMATTED EXPENSES
                 const loadedExpenses = [];
 
-                // LOOP THROUGH EXPENSES IN DATABASE, FORMAT THEM AND PUSH TO ARRAY
+                // LOOP THROUGH EACH EXPENSE IN DATABASE
                 for (const key in data) {
 
                     loadedExpenses.push({
@@ -41,19 +41,17 @@ export default function HomeScreen() {
                     });
                 }
 
-                // SAVE FORMATTED EXPENSES TO STATE
+                // SAVE EXPENSES INTO STATE
                 setExpenses(loadedExpenses);
 
-                // IF NO DATA, SET EXPENSES TO EMPTY ARRAY
             } else {
+
+                // IF NO DATA EXISTS, USE EMPTY ARRAY
                 setExpenses([]);
             }
         });
 
-        // STOP LISTENING TO DATABASE
-        return () => unsubscribe();
     }, []);
-
 
 
     // FUNCTION TO ADD EXPENSES TO DATABASE

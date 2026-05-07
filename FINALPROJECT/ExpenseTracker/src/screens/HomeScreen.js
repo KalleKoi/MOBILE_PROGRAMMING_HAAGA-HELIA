@@ -12,6 +12,7 @@ export default function HomeScreen() {
     const [expenses, setExpenses] = useState([]);
 
 
+    // useEffect TO LOAD EXPENSES FROM DATABASE 
 
     useEffect(() => {
 
@@ -30,7 +31,6 @@ export default function HomeScreen() {
 
                 // LOOP THROUGH EXPENSES IN DATABASE, FORMAT THEM AND PUSH TO ARRAY
                 for (const key in data) {
-
 
                     loadedExpenses.push({
                         id: key,

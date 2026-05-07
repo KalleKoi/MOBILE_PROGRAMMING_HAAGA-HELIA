@@ -35,13 +35,18 @@ export default function HomeScreen() {
 
 
     async function addExpense() {
-        if (!amount.trim()) return;
+        if (!amount.trim())
+            return;
 
         const uid = auth.currentUser.uid;
         const expensesRef = ref(db, `users/${uid}/expenses`);
 
+        const numberAmount = Number(amount.replace(',', '.'));
+        if (isNaN(numberAmount))
+            return;
+
         await push(expensesRef, {
-            amount: parseFloat(amount.replace(',', '.')),
+            amount: numberAmount,
             description: description.trim() ? description : null,
             category: category.trim() ? category : null,
             createdAt: Date.now()
@@ -54,24 +59,29 @@ export default function HomeScreen() {
 
 
     // Calculation for total expenses of the current day and month
-    const startOfToday = new Date().setHours(0, 0, 0, 0);
 
     const now = new Date();
+    const startOfToday = new Date().setHours(0, 0, 0, 0);
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
 
     let totalToday = 0;
     let totalThisMonth = 0;
 
     for (const e of expenses) {
-        if (e.createdAt >= startOfMonth) {
-            totalThisMonth += +e.amount || 0;
+        let amount = Number(e.amount);
+
+        if (isNaN(amount)) {
+            amount = 0;
         }
+
+        if (e.createdAt >= startOfMonth) {
+            totalThisMonth += amount;
+        }
+
         if (e.createdAt >= startOfToday) {
-            totalToday += +e.amount || 0;
+            totalToday += amount;
         }
     }
-
-
 
 
     return (
@@ -89,9 +99,9 @@ export default function HomeScreen() {
                 Logout
             </Button>
 
-            <Text style={{ marginVertical: 10, fontSize: 16, fontWeight: '600' }}>
-                💰 Today: {totalToday.toFixed(2)} €
-                💰 This Month: {totalThisMonth.toFixed(2)} €
+            <Text style={{ marginVertical: 10, fontSize: 15, fontWeight: '600' }}>
+                Today: {totalToday.toFixed(2)} €
+                This Month: {totalThisMonth.toFixed(2)} €
             </Text>
 
             <TextInput

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { TextInput, Button, Text, Card } from 'react-native-paper';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase';
@@ -7,28 +8,25 @@ import { auth } from '../../firebase';
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
 
     const handleLogin = async () => {
         try {
-            setError('');
             await signInWithEmailAndPassword(auth, email, password);
         } catch (err) {
-            setError(err.message);
+            Alert.alert("Login failed");
         }
     };
 
     const handleSignup = async () => {
         try {
-            setError('');
             await createUserWithEmailAndPassword(auth, email, password);
         } catch (err) {
-            setError(err.message);
+            Alert.alert("Signup failed");
         }
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Card>
                 <Card.Content>
                     <Text style={styles.title}>Login & Sign up</Text>
@@ -43,13 +41,11 @@ export default function Login() {
 
                     <TextInput
                         style={styles.input}
-                        placeholder="Password"
+                        placeholder="Password (6+ characters long)"
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry
                     />
-
-                    {error ? <Text style={styles.error}>{error}</Text> : null}
 
                     <Button mode="contained" onPress={handleLogin}>
                         Login
@@ -62,7 +58,7 @@ export default function Login() {
                     </Button>
                 </Card.Content>
             </Card>
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -76,15 +72,10 @@ const styles = StyleSheet.create({
         fontSize: 22,
         marginBottom: 20,
         textAlign: 'center',
+        fontWeight: 'bold',
     },
     input: {
         borderWidth: 1,
-        padding: 10,
-        marginBottom: 12,
-        borderRadius: 6,
-    },
-    error: {
-        color: 'red',
         marginBottom: 10,
-    },
+    }
 });

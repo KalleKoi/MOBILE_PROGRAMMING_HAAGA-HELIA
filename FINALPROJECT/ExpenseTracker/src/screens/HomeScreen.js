@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, FlatList } from 'react-native';
 import { Text, TextInput, Button, Card } from 'react-native-paper';
-import { db } from '../../firebase';
+import { db, auth } from '../../firebase';
 import { ref, push, onValue } from 'firebase/database';
 
 export default function HomeScreen() {
@@ -11,17 +11,20 @@ export default function HomeScreen() {
     const [expenses, setExpenses] = useState([]);
 
 
-    const expensesRef = ref(db, 'expenses');
-
-
     useEffect(() => {
-        const itemsRef = ref(db, 'expenses');
+        const uid = auth.currentUser.uid;
+        const itemsRef = ref(db, `users/${uid}/expenses`);
 
         const unsubscribe = onValue(itemsRef, (snapshot) => {
             const data = snapshot.val();
 
             if (data) {
-                setExpenses(Object.values(data));
+                const loadedExpenses = Object.entries(data).map(([id, value]) => ({
+                    id,
+                    ...value,
+                }));
+
+                setExpenses(loadedExpenses);
             } else {
                 setExpenses([]);
             }
@@ -33,6 +36,9 @@ export default function HomeScreen() {
 
     async function addExpense() {
         if (!amount.trim()) return;
+
+        const uid = auth.currentUser.uid;
+        const expensesRef = ref(db, `users/${uid}/expenses`);
 
         await push(expensesRef, {
             amount: parseFloat(amount.replace(',', '.')),
@@ -50,6 +56,7 @@ export default function HomeScreen() {
     // Calculation for total expenses of the current day and month
     const startOfToday = new Date().setHours(0, 0, 0, 0);
 
+    const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
 
     let totalToday = 0;
@@ -74,9 +81,17 @@ export default function HomeScreen() {
                 Expense Tracker
             </Text>
 
+            <Button
+                mode="contained"
+                onPress={() => auth.signOut()}
+                style={{ position: 'absolute', top: 10, right: 20 }}
+            >
+                Logout
+            </Button>
+
             <Text style={{ marginVertical: 10, fontSize: 16, fontWeight: '600' }}>
                 💰 Today: {totalToday.toFixed(2)} €
-                💰 This month: {totalThisMonth.toFixed(2)} €
+                💰 This Month: {totalThisMonth.toFixed(2)} €
             </Text>
 
             <TextInput

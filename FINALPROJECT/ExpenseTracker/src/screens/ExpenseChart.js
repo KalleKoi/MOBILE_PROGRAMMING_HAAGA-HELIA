@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { View, Dimensions } from 'react-native';
 import { Text } from 'react-native-paper';
 import { PieChart, BarChart } from 'react-native-chart-kit';
-
 import { db, auth } from '../../firebase';
 import { ref, onValue } from 'firebase/database';
 
@@ -45,7 +44,7 @@ export default function ExpenseChart() {
         }
     }
 
-    // DATA FOR CHART
+    // DATA FOR CHART 
     const pieData = [];
 
     const barData = {
@@ -57,6 +56,8 @@ export default function ExpenseChart() {
         ]
     };
 
+    // LOOP THROUGH CATEGORIES TO CALCULATE TOTAL AMOUNT FOR EACH CATEGORY AND PREPARE DATA FOR CHARTS
+    // FOR THIS PART I USED THE HELP OF CLAUDE
     for (const category of categories) {
         let total = 0;
 
@@ -64,7 +65,7 @@ export default function ExpenseChart() {
             const expCategory = (expense.category || 'Other')
                 .toLowerCase()
                 .trim();
-
+            // CHECKS IF EXPENSE CATEGORY MATCHES CURRENT CATEGORY IN LOOP
             if (expCategory === category) {
 
                 // CONVERT TO NUMBER SO THAT MATH CAN BE DONE, OTHERWISE IT WOULD CONCATENATE STRINGS INSTEAD OF ADDING NUMBERS
@@ -89,6 +90,7 @@ export default function ExpenseChart() {
             amount: total,
             color: color,
         });
+
         // FOR BARCHART PUSH I USED HELP OF CLAUDE
         barData.labels.push(categoryName);
         barData.datasets[0].data.push(total);

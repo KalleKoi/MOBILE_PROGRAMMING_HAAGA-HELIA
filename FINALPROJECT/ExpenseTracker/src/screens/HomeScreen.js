@@ -11,13 +11,14 @@ export default function HomeScreen() {
     const [category, setCategory] = useState('');
     const [expenses, setExpenses] = useState([]);
 
+    // GETS CURRENT USER ID AND PATH TO EXPENSES IN DATABASE
+    const uid = auth.currentUser.uid;
+    const itemsRef = ref(db, `users/${uid}/expenses`);
 
-    // useEffect TO LOAD EXPENSES FROM DATABASE 
+
+    // useEffect TO LOAD EXPENSES FROM DATABASE AND LISTEN TO CHANGES IN REALTIME
 
     useEffect(() => {
-
-        const uid = auth.currentUser.uid;
-        const itemsRef = ref(db, `users/${uid}/expenses`);
 
         // START LISTENING TO DATABASE CHANGES
         return onValue(itemsRef, (snapshot) => {
@@ -61,19 +62,16 @@ export default function HomeScreen() {
         if (!amount.trim())
             return;
 
-        // GETS CURRENT USER ID AND PATH TO EXPENSES IN DATABASE
-        const uid = auth.currentUser.uid;
-        const expensesRef = ref(db, `users/${uid}/expenses`);
-
-        // CONVERTS AMOUNT TO NUMBER, IF IT'S NOT A NUMBER, DOES NOTHING
+        // CONVERTS AMOUNT TO NUMBER, IF IT'S NOT A NUMBER, DOES NOTHING. ALSO CHANGE COMMA TO DOT BECAUSE
+        // IT IS REQUIRED FOR MATH
         const numberAmount = Number(amount.replace(',', '.'));
+
         if (isNaN(numberAmount))
             return;
 
-        // PUSHES NEW EXPENSE TO DATABASE WITH AMOUNT, DESCRIPTION, CATEGORY AND CREATED AT TIMESTAMP
-        // FOR CALCULATING TODAY'S AND THIS MONTH'S EXPENSES
+        // PUSHES NEW EXPENSE TO DATABASE
 
-        await push(expensesRef, {
+        await push(itemsRef, {
             amount: numberAmount,
             description: description.trim() ? description : null,
             category: category.trim() ? category : null,
@@ -98,11 +96,8 @@ export default function HomeScreen() {
     let totalThisMonth = 0;
 
     for (const e of expenses) {
-        let amount = Number(e.amount);
 
-        if (isNaN(amount)) {
-            amount = 0;
-        }
+        let amount = Number(e.amount);
 
         if (e.createdAt >= startOfMonth) {
             totalThisMonth += amount;

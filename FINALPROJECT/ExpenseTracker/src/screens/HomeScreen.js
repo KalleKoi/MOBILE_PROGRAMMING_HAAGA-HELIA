@@ -5,45 +5,75 @@ import { db, auth } from '../../firebase';
 import { ref, push, onValue } from 'firebase/database';
 
 export default function HomeScreen() {
+    // STATES FOR NEW EXPENSE INPUTS AND EXPENSES LIST
     const [amount, setAmount] = useState('');
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
     const [expenses, setExpenses] = useState([]);
 
 
+
     useEffect(() => {
+
+        // GET USER ID AND PATH TO EXPENSES IN DATABASE
         const uid = auth.currentUser.uid;
         const itemsRef = ref(db, `users/${uid}/expenses`);
 
+        // LISTENS TO CHANGES IN DATABASE,
         const unsubscribe = onValue(itemsRef, (snapshot) => {
             const data = snapshot.val();
 
             if (data) {
-                const loadedExpenses = Object.entries(data).map(([id, value]) => ({
-                    id,
-                    ...value,
-                }));
 
+                // ARRAY TO HOLD FORMATTED EXPENSES
+                const loadedExpenses = [];
+
+                // LOOP THROUGH EXPENSES IN DATABASE, FORMAT THEM AND PUSH TO ARRAY
+                for (const key in data) {
+
+
+                    loadedExpenses.push({
+                        id: key,
+                        amount: data[key].amount,
+                        description: data[key].description,
+                        category: data[key].category,
+                        createdAt: data[key].createdAt
+                    });
+                }
+
+                // SAVE FORMATTED EXPENSES TO STATE
                 setExpenses(loadedExpenses);
+
+                // IF NO DATA, SET EXPENSES TO EMPTY ARRAY
             } else {
                 setExpenses([]);
             }
         });
 
+        // STOP LISTENING TO DATABASE
         return () => unsubscribe();
     }, []);
 
 
+
+    // FUNCTION TO ADD EXPENSES TO DATABASE
     async function addExpense() {
+
+        // IF AMOUNT IS EMPTY OR NOT A NUMBER, DOES NOTHING
         if (!amount.trim())
             return;
 
+        // GETS CURRENT USER ID AND PATH TO EXPENSES IN DATABASE
         const uid = auth.currentUser.uid;
         const expensesRef = ref(db, `users/${uid}/expenses`);
 
+        // CONVERTS AMOUNT TO NUMBER, IF IT'S NOT A NUMBER, DOES NOTHING
         const numberAmount = Number(amount.replace(',', '.'));
         if (isNaN(numberAmount))
             return;
+
+        // PUSHES NEW EXPENSE TO DATABASE WITH AMOUNT, DESCRIPTION, CATEGORY AND CREATED AT TIMESTAMP
+        // FOR CALCULATING TODAY'S AND THIS MONTH'S EXPENSES
 
         await push(expensesRef, {
             amount: numberAmount,
@@ -52,13 +82,15 @@ export default function HomeScreen() {
             createdAt: Date.now()
         });
 
+        // CLEAR ALL INPUTS AFTER ADDING EXPENSE
+
         setAmount('');
         setDescription('');
         setCategory('');
     }
 
 
-    // Calculation for total expenses of the current day and month
+    // CALCULATION FOR TODAY'S AND THIS MONTH'S EXPENSES
 
     const now = new Date();
     const startOfToday = new Date().setHours(0, 0, 0, 0);
@@ -133,6 +165,7 @@ export default function HomeScreen() {
             <FlatList
                 data={expenses}
                 keyExtractor={(item) => item.id}
+
                 renderItem={({ item }) => (
                     <Card style={{ marginTop: 10 }}>
                         <Card.Content>

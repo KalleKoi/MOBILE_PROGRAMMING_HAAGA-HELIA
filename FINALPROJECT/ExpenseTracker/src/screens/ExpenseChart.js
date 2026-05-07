@@ -89,7 +89,7 @@ export default function ExpenseChart() {
             amount: total,
             color: color,
         });
-
+        // FOR BARCHART PUSH I USED HELP OF CLAUDE
         barData.labels.push(categoryName);
         barData.datasets[0].data.push(total);
     }
@@ -109,7 +109,19 @@ export default function ExpenseChart() {
         return colors[index % colors.length];
     }
 
+    // NEEDED TO RENDER RESPONSIVE CHARTS PROPERLY
     const screenWidth = Dimensions.get('window').width;
+
+    //CHART CONFIG THAT IS NEEDED FOR BARCHART
+    const chartConfig = {
+        backgroundGradientFrom: '#ffffff',
+        backgroundGradientTo: '#ffffff',
+        decimalPlaces: 0,
+        color: () => '#6C63FF',
+        labelColor: () => '#333333',
+        barPercentage: 0.6,
+    };
+
 
     return (
         <View style={{ padding: 20 }}>
@@ -123,33 +135,35 @@ export default function ExpenseChart() {
                 width={screenWidth - 40}
                 height={220}
                 accessor="amount"
-                backgroundColor="transparent"
+                backgroundColor="white"
                 paddingLeft="15"
                 absolute
                 chartConfig={{
                     color: () => '#000'
                 }}
-            />
-            <Text style={{ fontSize: 24, fontWeight: 'bold' }}>
-                📊 Expenses bar chart
-            </Text>
-            <BarChart
-                data={barData}
-                width={screenWidth - 40}
-                height={300}
-                fromZero
-                yAxisLabel="€"
-                yAxisSuffix=""
-                chartConfig={{
-                    backgroundGradientFrom: '#fff',
-                    backgroundGradientTo: '#fff',
-                    decimalPlaces: 2,
-                    color: () => '#000',
-                    labelColor: () => '#000',
-                }}
                 style={{
                     marginTop: 10,
                     borderRadius: 8
+                }}
+            />
+
+            <Text style={{ fontSize: 24, fontWeight: 'bold', marginTop: 20 }}>
+                📊 Expenses bar chart
+            </Text>
+
+            <BarChart
+                data={barData}
+                width={screenWidth}
+                height={220}
+                fromZero
+                yAxisLabel="€"
+                chartConfig={{
+                    backgroundGradientFrom: '#ffffff',
+                    backgroundGradientTo: '#ffffff',
+                    decimalPlaces: 0,
+                    color: () => '#6C63FF',
+                    labelColor: () => '#333333',
+                    barPercentage: 0.6,
                 }}
             />
 
